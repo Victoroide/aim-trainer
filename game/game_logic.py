@@ -51,7 +51,7 @@ def main():
     
     target_position_x, target_position_y, score, start_time = reset_game()
     last_hit_time = start_time
-    game_duration = 10  # Duration of each round in seconds
+    game_duration = 30  # Duration of each round in seconds
     running = True
     paused = False
     game_over = False
