@@ -2,12 +2,12 @@ import pygame
 import random
 import time
 
-# Initialize Pygame
 pygame.init()
 
-# Full-Screen Mode
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-SCREEN_WIDTH, SCREEN_HEIGHT = screen.get_size()
+# Adapting to different monitor sizes
+display_info = pygame.display.Info()
+SCREEN_WIDTH, SCREEN_HEIGHT = display_info.current_w, display_info.current_h
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Aim Trainer")
 
 # Colors
@@ -16,11 +16,11 @@ TARGET_COLOR = (70, 130, 180)
 TEXT_COLOR = (255, 255, 255)  # White for text
 
 # Game Variables
-target_radius = 50  # Increased target size
+target_radius = 50 
 font = pygame.font.Font(None, 36)
 clock = pygame.time.Clock()
 surface = pygame.Surface(screen.get_size())
-surface.set_alpha(128)  # Alpha for blurred background
+surface.set_alpha(128)  
 
 def reset_game():
     return (random.randint(target_radius, SCREEN_WIDTH - target_radius),
@@ -28,12 +28,27 @@ def reset_game():
             0,
             time.time())
 
-def display_menu(paused):
+def display_screen(paused, game_over, score=None):
     surface.fill(BACKGROUND_COLOR)
     screen.blit(surface, (0, 0))
-    menu_text = font.render("R: Resume - Q: Quit", True, TEXT_COLOR) if paused else font.render("Game Over! R: Replay - Q: Quit", True, TEXT_COLOR)
-    screen.blit(menu_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 15))
+
+    if game_over and score is not None:
+        # Display the final score when the game is over
+        final_score_text = font.render(f"Final Score: {score}", True, TEXT_COLOR)
+        surface.blit(final_score_text, (SCREEN_WIDTH // 2 - final_score_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+
+    # Determine the menu text based on the game state
+    if paused:
+        menu_text = font.render("R: Resume - Q: Quit", True, TEXT_COLOR)
+    elif game_over:
+        menu_text = font.render("Game Over! R: Replay - Q: Quit", True, TEXT_COLOR)
+    else:
+        menu_text = font.render("", True, TEXT_COLOR)  # Empty text if not paused or game over
+
+    # Blit the menu text to the screen
+    screen.blit(menu_text, (SCREEN_WIDTH // 2 - menu_text.get_width() // 2, SCREEN_HEIGHT // 2 - 15))
     pygame.display.flip()
+
 
 def calculate_score(hit, current_time, last_hit_time):
     if hit:
@@ -54,7 +69,7 @@ def performance_message(score):
 def game_loop():
     target_position_x, target_position_y, score, start_time = reset_game()
     last_hit_time = start_time
-    game_duration = 30
+    game_duration = 10  # Duration of each round in seconds
     running = True
     paused = False
     game_over = False
@@ -67,14 +82,14 @@ def game_loop():
                 if event.key == pygame.K_ESCAPE:
                     paused = not paused
                     if paused or game_over:
-                        display_menu(paused)
+                        display_screen(paused, game_over)  
                 elif event.key == pygame.K_r:
                     if paused or game_over:
                         target_position_x, target_position_y, score, start_time = reset_game()
                         last_hit_time = start_time
                         paused = False
                         game_over = False
-                elif event.key == pygame.K_q:
+                elif event.key is pygame.K_q:
                     running = False
 
             if not paused and not game_over:
@@ -94,13 +109,23 @@ def game_loop():
             pygame.draw.circle(screen, TARGET_COLOR, (target_position_x, target_position_y), target_radius)
             score_text = font.render(f"Score: {score}", True, TEXT_COLOR)
             screen.blit(score_text, (10, 10))
+
             if time.time() - start_time > game_duration and not game_over:
                 game_over = True
-                message = performance_message(score)
-                display_menu(game_over)
-                performance_text = font.render(message, True, TEXT_COLOR)
-                screen.blit(performance_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 20))
-                pygame.display.flip()
+                display_screen(False, True, score)  # Display final score and menu
+                waiting_for_input = True
+                while waiting_for_input:
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_r:
+                                target_position_x, target_position_y, score, start_time = reset_game()
+                                last_hit_time = start_time
+                                game_over = False
+                                waiting_for_input = False
+                                display_screen(False, False)  # Clear the screen
+                            elif event.key == pygame.K_q:
+                                running = False
+                                waiting_for_input = False
 
         pygame.display.flip()
         clock.tick(60)
