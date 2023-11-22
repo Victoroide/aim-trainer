@@ -23,7 +23,7 @@ class Display:
         elif game_over:
             menu_text = self.font.render("Game Over! R: Replay - Q: Quit", True, self.text_color)
         else:
-            menu_text = self.font.render("", True, self.text_color)  # Empty text if not paused or game over
+            menu_text = self.font.render("", True, self.text_color) 
 
         self.screen.blit(menu_text, (self.screen_width // 2 - menu_text.get_width() // 2, self.screen_height // 2 - 15))
         pygame.display.flip()

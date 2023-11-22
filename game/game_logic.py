@@ -14,10 +14,10 @@ def reset_game():
 def calculate_score(hit, current_time, last_hit_time):
     if hit:
         time_difference = current_time - last_hit_time
-        score_increment = max(1, 10 - int(time_difference * 2))  # More points for faster hits
+        score_increment = max(1, 10 - int(time_difference * 2)) 
         return score_increment
     else:
-        return -5  # Subtract points for a miss
+        return -5  
     
 def performance_message(score):
     if score > 50:
@@ -28,9 +28,7 @@ def performance_message(score):
         return "Keep Practicing!"
     
 def main():
-    # Initialize Pygame and settings
     pygame.init()
-    # Use the settings like so:
     SCREEN_WIDTH = settings['SCREEN_WIDTH']
     SCREEN_HEIGHT = settings['SCREEN_HEIGHT']
     BACKGROUND_COLOR = settings['BACKGROUND_COLOR']
@@ -38,7 +36,6 @@ def main():
     TEXT_COLOR = settings['TEXT_COLOR']
     target_radius = settings['target_radius']
 
-    # Setup the display, font, and clock
     screen = pygame.display.set_mode((settings['SCREEN_WIDTH'], settings['SCREEN_HEIGHT']))
     pygame.display.set_caption("Aim Trainer")
     font = pygame.font.Font(None, 36)
@@ -46,7 +43,6 @@ def main():
     surface = pygame.Surface(screen.get_size())
     surface.set_alpha(128)
 
-    # Create a Display instance
     display = Display(screen, surface, font, settings['BACKGROUND_COLOR'], settings['TEXT_COLOR'], settings['SCREEN_WIDTH'], settings['SCREEN_HEIGHT'])
     
     target_position_x, target_position_y, score, start_time = reset_game()
@@ -94,7 +90,7 @@ def main():
 
             if time.time() - start_time > game_duration and not game_over:
                 game_over = True
-                display.display_screen(False, True, score) # Display final score and menu
+                display.display_screen(False, True, score) 
                 waiting_for_input = True
                 while waiting_for_input:
                     for event in pygame.event.get():

@@ -4,15 +4,12 @@ def init_settings():
     display_info = pygame.display.Info()
     SCREEN_WIDTH, SCREEN_HEIGHT = display_info.current_w, display_info.current_h
 
-    # Colors
     BACKGROUND_COLOR = (45, 45, 45)  # Dark grey, eye-friendly
     TARGET_COLOR = (70, 130, 180)
     TEXT_COLOR = (255, 255, 255)  # White for text
 
-    # Game Variables
     target_radius = 50
 
-    # Return a dictionary of settings
     return {
         "SCREEN_WIDTH": SCREEN_WIDTH,
         "SCREEN_HEIGHT": SCREEN_HEIGHT,
